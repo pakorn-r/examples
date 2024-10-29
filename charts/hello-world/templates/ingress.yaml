@@ -1,16 +1,18 @@
-apiVersion: configuration.konghq.com/v1
-kind: KongIngress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  #name: {{ include "hello-world.fullname" . }}
-  name: example-route
-  labels:
-    {{- include "hello-world.labels" . | nindent 4 }}
-proxy:
-  path: /example
-  protocol: http
-route:
-  methods:
-    - GET
-service:
-  host: {{ include "hello-world.fullname" . }}
-  port: {{ .Values.service.port }}
+  name: example-ingress
+  annotations:
+    konghq.com/strip-path: "true"
+spec:
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      - path: /example
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "hello-world.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
